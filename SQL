@@ -1,0 +1,49 @@
+#1. How many users completed an exercise in their first month per monthly cohort?
+#Assumptions made for question1:
+#a)Percentage calculated based on total number of users.
+#b)And user_id as primary key so each user is allotted to only one task.
+
+
+#QUERY1:(ORACLE DB)
+
+select extract(year from created_at) as yr, extract(month from created_at) as mon,(count(user_id)*100/(select count(*) from users )) as percent_of_users
+from users natural join exercises
+where to_date(exercise_completed_date)-to_date(created_at)<31
+group by extract(year from created_at), extract(month from created_at) 
+order by yr, mon;
+
+
+#2.Here I understood the question in two ways, hence I wrote two queries
+
+#QUERY2:Query to Find the top five organizations that have the highest average phq9
+score per patient. (MY SQL DB)
+
+SELECT  organization_name FROM
+(
+ select patient_id,provider_id
+from  PHq9 
+group by patient_id,provider_id 
+)res1 natural join(
+ select patient_id
+from  PHq9 
+group by patient_id
+order by avg(score) desc
+)res2  natural join providers
+LIMIT 5;
+
+
+#Query to find the organizations that have the most severe patient population?
+# when the following Assumptions are made:
+a)Considered only severe patients.
+b)provider_id and patient_id are unique.
+
+SELECT * FROM
+(
+ select organization_name 
+from  PHq9 natural join providers
+where score>=20
+order by score desc
+) resultSet
+LIMIT 5;
+
+
